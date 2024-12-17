@@ -248,6 +248,94 @@ async def stopmonitor(inter: disnake.ApplicationCommandInteraction):
     del active_monitors[guild_id]
     await inter.response.send_message("Monitoring stopped and activity report has been generated.", ephemeral=True)
 
+@bot.slash_command(description="Post the guild schedule")
+@commands.has_permissions(administrator=True)
+async def schedule(inter: disnake.ApplicationCommandInteraction):
+    schedule_channel = inter.guild.get_channel(1308289712670248970)
+    
+    embed = disnake.Embed(
+        title="Blood Wrath Guild Schedule",
+        description="**🗡️ PvP all Day everyday!!!**\n"
+                   "Inter-Server Wars are a way for Guilds to fight against other guilds on other servers. "
+                   "These wars happen every 2 weeks - 48 vs 48 Guild vs Guild battle.\n\n"
+                   "**🛒 Tax Cart:** Depends on defending guild!",
+        color=disnake.Color.dark_red()
+    )
+
+    # Sunday
+    embed.add_field(
+        name="📅 Sunday",
+        value="• **Siege:** 5:00 PM EST *(Every other Sunday)*\n"
+              "• **Guild Bosses:** 7:30 PM EST\n"
+              "• **Rift Stone Boss:** After Guild Bosses\n"
+              "• **Conflict Bosses (Alliance):** 8:00 PM & 11:00 PM EST",
+        inline=False
+    )
+
+    # Monday
+    embed.add_field(
+        name="📅 Monday",
+        value="• **Rift Stone Boss:** 7:30 PM EST\n"
+              "• **Conflict Bosses (Alliance):** 8:00 PM & 11:00 PM EST\n"
+              "• **Boon Stone:** 9:00 PM EST\n"
+              "• **Interserver Stone:** 9:30 PM EST *(Every other week)*",
+        inline=False
+    )
+
+    # Tuesday
+    embed.add_field(
+        name="📅 Tuesday",
+        value="• **Rift Stone Boss:** 7:30 PM EST\n"
+              "• **Conflict Bosses (Alliance):** 8:00 PM & 11:00 PM EST\n"
+              "• **Rift Stone:** 9:00 PM EST\n"
+              "• **Interserver Stone:** 9:30 PM EST *(Every other week)*",
+        inline=False
+    )
+
+    # Wednesday
+    embed.add_field(
+        name="📅 Wednesday",
+        value="• **Rift Stone Boss:** 7:30 PM EST\n"
+              "• **Conflict Bosses (Alliance):** 8:00 PM & 11:00 PM EST",
+        inline=False
+    )
+
+    # Thursday
+    embed.add_field(
+        name="📅 Thursday",
+        value="• **Guild Bosses:** 7:30 PM EST\n"
+              "• **Rift Stone Boss:** After Guild Bosses\n"
+              "• **Conflict Bosses (Alliance):** 8:00 PM & 11:00 PM EST",
+        inline=False
+    )
+
+    # Friday
+    embed.add_field(
+        name="📅 Friday",
+        value="• **Rift Stone Boss:** 7:30 PM EST\n"
+              "• **Conflict Bosses (Alliance):** 8:00 PM & 11:00 PM EST\n"
+              "• **Rift Stone:** 9:00 PM EST\n"
+              "• **Interserver Stone:** 9:30 PM EST *(Every other week)*",
+        inline=False
+    )
+
+    # Saturday
+    embed.add_field(
+        name="📅 Saturday",
+        value="• **Rift Stone Boss:** 7:30 PM EST\n"
+              "• **Conflict Bosses (Alliance):** 8:00 PM & 11:00 PM EST\n"
+              "• **Boon Stone:** 9:00 PM EST\n"
+              "• **Interserver Stone:** 9:30 PM EST *(Every other week)*",
+        inline=False
+    )
+
+    # Add footer with last updated timestamp
+    embed.set_footer(text="Last Updated")
+    embed.timestamp = datetime.now()
+
+    await schedule_channel.send(embed=embed)
+    await inter.response.send_message("Schedule has been posted.", ephemeral=True)
+
 @bot.slash_command(description="Submit an absence report")
 async def absent(inter: disnake.ApplicationCommandInteraction):
     if not any(role.id == AUTHORIZED_ROLE_ID for role in inter.user.roles):
