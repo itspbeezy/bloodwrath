@@ -51,7 +51,7 @@ intents.messages = True
 bot = commands.Bot(
     command_prefix='/',
     intents=intents,
-    test_guilds=[YOUR_SERVER_ID]  # Replace with your server ID
+    test_guilds=[1210689535269408828]  # Replace with your server ID
 )
 
 # Constants
