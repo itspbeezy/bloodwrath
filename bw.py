@@ -48,7 +48,6 @@ intents.voice_states = True
 intents.guilds = True
 intents.messages = True
 
-# Create bot instance with guild IDs
 bot = commands.InteractionBot(
     intents=intents,
     test_guilds=[1210689535269408828]
@@ -94,8 +93,10 @@ class AbsenceModal(disnake.ui.Modal):
         super().__init__(title="Absence Report", components=components)
 
     async def callback(self, inter: disnake.ModalInteraction):
+        # Get the absence channel
         absence_channel = inter.guild.get_channel(ABSENCE_CHANNEL_ID)
         
+        # Create embed for the absence report
         embed = disnake.Embed(
             title="Absence Report",
             color=disnake.Color.blue(),
@@ -114,6 +115,7 @@ class AbsenceModal(disnake.ui.Modal):
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
+    print('Bot is ready and commands should be available!')
 
 @bot.event
 async def on_voice_state_update(member, before, after):
