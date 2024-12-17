@@ -115,7 +115,18 @@ class AbsenceModal(disnake.ui.Modal):
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
-    print('Bot is ready and commands should be available!')
+    try:
+        # Clear existing commands
+        await bot.http.bulk_upsert_global_commands([], application_id=bot.application_id)
+        for guild_id in bot.test_guilds:
+            await bot.http.bulk_upsert_guild_commands([], application_id=bot.application_id, guild_id=guild_id)
+        print('Cleared existing commands')
+        
+        # Register commands
+        await bot.sync_all()
+        print('Registered new commands')
+    except Exception as e:
+        print(f'Error during command sync: {e}')
 
 @bot.event
 async def on_voice_state_update(member, before, after):
@@ -149,7 +160,11 @@ async def attendance(inter: disnake.ApplicationCommandInteraction):
     for vc in inter.guild.voice_channels:
         members = vc.members
         if members:
-            member_list = "\n".join([f"• **{member.display_name}** ({member.name})" for member in members])
+            # Updated format to show nickname (or name if no nickname) and username
+            member_list = "\n".join([
+                f"• {member.nick or member.name} ({member.name}#{member.discriminator})" 
+                for member in members
+            ])
             embed.add_field(
                 name=f"{vc.name} ({len(members)} members)",
                 value=member_list,
