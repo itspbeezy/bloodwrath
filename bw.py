@@ -50,7 +50,7 @@ intents.messages = True
 
 bot = commands.InteractionBot(
     intents=intents,
-    test_guilds=[1210689535269408828]
+    test_guilds=[1210689535269408828]  # Your server ID
 )
 
 # Constants
@@ -115,18 +115,7 @@ class AbsenceModal(disnake.ui.Modal):
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
-    try:
-        # Clear existing commands
-        await bot.http.bulk_upsert_global_commands([], application_id=bot.application_id)
-        for guild_id in bot.test_guilds:
-            await bot.http.bulk_upsert_guild_commands([], application_id=bot.application_id, guild_id=guild_id)
-        print('Cleared existing commands')
-        
-        # Register commands
-        await bot.sync_all()
-        print('Registered new commands')
-    except Exception as e:
-        print(f'Error during command sync: {e}')
+    print(f'Bot is ready and serving {len(bot.guilds)} guilds')
 
 @bot.event
 async def on_voice_state_update(member, before, after):
@@ -143,7 +132,7 @@ async def on_voice_state_update(member, before, after):
              (after.channel is None or after.channel.id != tracker.channel_id):
             tracker.record_leave(member.id, datetime.now(pytz.UTC))
 
-@bot.slash_command(description="Take attendance of all users in voice channels")
+@bot.slash_command(name="attendance", description="Take attendance of all users in voice channels")
 @commands.has_permissions(administrator=True)
 async def attendance(inter: disnake.ApplicationCommandInteraction):
     attendance_channel = inter.guild.get_channel(ATTENDANCE_CHANNEL_ID)
@@ -160,14 +149,20 @@ async def attendance(inter: disnake.ApplicationCommandInteraction):
     for vc in inter.guild.voice_channels:
         members = vc.members
         if members:
-            # Updated format to show nickname (or name if no nickname) and username
-            member_list = "\n".join([
-                f"• {member.nick or member.name} ({member.name}#{member.discriminator})" 
-                for member in members
-            ])
+            # Updated format to show nickname and username
+            member_list = []
+            for member in members:
+                display_name = member.nick if member.nick else member.name
+                # Handle both modern and legacy Discord usernames
+                if hasattr(member, 'discriminator') and member.discriminator != '0':
+                    username = f"{member.name}#{member.discriminator}"
+                else:
+                    username = member.name
+                member_list.append(f"• {display_name} ({username})")
+            
             embed.add_field(
                 name=f"{vc.name} ({len(members)} members)",
-                value=member_list,
+                value="\n".join(member_list),
                 inline=False
             )
     
