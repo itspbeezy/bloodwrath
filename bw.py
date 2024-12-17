@@ -50,7 +50,7 @@ intents.messages = True
 
 bot = commands.InteractionBot(
     intents=intents,
-    test_guilds=[1210689535269408828]  # Your server ID
+    test_guilds=[1210689535269408828]
 )
 
 # Constants
@@ -115,7 +115,6 @@ class AbsenceModal(disnake.ui.Modal):
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
-    print(f'Bot is ready and serving {len(bot.guilds)} guilds')
 
 @bot.event
 async def on_voice_state_update(member, before, after):
