@@ -69,7 +69,7 @@ async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     try:
         print('Syncing commands...')
-        await bot.sync_commands()
+        await bot.sync_all_commands()  # Changed from sync_commands() to sync_all_commands()
         print('Commands synced successfully!')
     except Exception as e:
         print(f'Error syncing commands: {e}')
