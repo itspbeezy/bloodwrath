@@ -13,8 +13,14 @@ intents = disnake.Intents.default()
 intents.message_content = True
 intents.members = True
 intents.voice_states = True
+intents.guilds = True
+intents.messages = True
 
-bot = commands.Bot(command_prefix='/', intents=intents)
+bot = commands.Bot(
+    command_prefix='/',
+    intents=intents,
+    test_guilds=[YOUR_SERVER_ID]  # Replace with your server ID
+)
 
 # Constants
 ATTENDANCE_CHANNEL_ID = 1316208046787133450
