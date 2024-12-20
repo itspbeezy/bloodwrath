@@ -1,19 +1,19 @@
 import discord
 from discord.ext import commands
+from discord import app_commands
 
 class AdminCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="sync")
-    @commands.is_owner()
-    async def sync_commands(self, ctx):
+    @app_commands.command(name="sync", description="Sync all slash commands")
+    async def sync_commands(self, interaction: discord.Interaction):
         """Sync all slash commands."""
         try:
             synced = await self.bot.tree.sync()
-            await ctx.send(f"Synced {len(synced)} commands globally.")
+            await interaction.response.send_message(f"Synced {len(synced)} commands globally.", ephemeral=True)
         except Exception as e:
-            await ctx.send(f"Error syncing commands: {e}")
+            await interaction.response.send_message(f"Error syncing commands: {e}", ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(AdminCog(bot))

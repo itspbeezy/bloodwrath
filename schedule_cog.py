@@ -1,14 +1,14 @@
 import discord
 from discord.ext import commands
+from discord import app_commands
 from datetime import datetime
 
 class ScheduleCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="schedule")
-    @commands.has_permissions(administrator=True)
-    async def post_schedule(self, ctx):
+    @app_commands.command(name="schedule", description="Post the guild schedule")
+    async def post_schedule(self, interaction: discord.Interaction):
         """Post the guild schedule."""
         embed = discord.Embed(
             title="Guild Schedule",
@@ -79,7 +79,7 @@ class ScheduleCog(commands.Cog):
 
         embed.set_footer(text="Last Updated")
 
-        await ctx.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(ScheduleCog(bot))
