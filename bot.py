@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import os
+import asyncio
 
 # Fetch the Discord token from Heroku Config Vars
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -18,11 +19,10 @@ async def on_ready():
     print(f"Bot is online as {bot.user}!")
     try:
         synced = await bot.tree.sync()
-        print(f"Successfully synced {len(synced)} commands.")
+        print(f"Successfully synced {len(synced)} commands globally.")
     except Exception as e:
         print(f"Error syncing commands: {e}")
 
-# Load extensions (cogs)
 async def load_extensions():
     initial_extensions = ["admin_cog", "attendance_cog", "absence_cog", "schedule_cog"]
     for extension in initial_extensions:
@@ -32,5 +32,11 @@ async def load_extensions():
         except Exception as e:
             print(f"Failed to load {extension}: {e}")
 
-bot.loop.run_until_complete(load_extensions())
-bot.run(TOKEN)
+# Run the bot and load extensions asynchronously
+async def main():
+    async with bot:
+        await load_extensions()
+        await bot.start(TOKEN)
+
+if __name__ == "__main__":
+    asyncio.run(main())
