@@ -5,9 +5,11 @@ from discord import app_commands
 # Role and admin permission check
 def has_admin_or_role(role_id):
     def predicate(interaction: discord.Interaction):
-        is_admin = interaction.user.guild_permissions.administrator
-        has_role = discord.utils.get(interaction.user.roles, id=role_id) is not None
-        return is_admin or has_role
+        if isinstance(interaction.user, discord.Member):
+            is_admin = interaction.user.guild_permissions.administrator
+            has_role = any(role.id == role_id for role in interaction.user.roles)
+            return is_admin or has_role
+        return False
     return app_commands.check(predicate)
 
 # Button class for user interaction
@@ -34,6 +36,7 @@ class ItemSelectionButtons(discord.ui.View):
         await interaction.response.send_message("You selected **Sell**.", ephemeral=True)
 
     def get_results(self):
+        """Retrieve the results for each button."""
         results = {
             "BIS": [user.display_name for user in self.bis_users],
             "Trait": [user.display_name for user in self.trait_users],
@@ -44,14 +47,14 @@ class ItemSelectionButtons(discord.ui.View):
 class ButtonTrackerCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.active_view = None  # Track the active view for results
+        self.active_views = {}  # Track active views per channel
 
     @app_commands.command(name="post_buttons", description="Post item selection buttons.")
     @has_admin_or_role(1308283136786042970)
     async def post_buttons(self, interaction: discord.Interaction):
-        """Post the buttons to the thread."""
+        """Post the buttons to the thread or channel."""
         view = ItemSelectionButtons()
-        self.active_view = view
+        self.active_views[interaction.channel.id] = view
 
         embed = discord.Embed(
             title="Item Selection",
@@ -70,11 +73,12 @@ class ButtonTrackerCog(commands.Cog):
     @has_admin_or_role(1308283136786042970)
     async def list_results(self, interaction: discord.Interaction):
         """List the users who selected each button."""
-        if not self.active_view:
-            await interaction.response.send_message("No buttons have been posted yet.", ephemeral=True)
+        view = self.active_views.get(interaction.channel.id)
+        if not view:
+            await interaction.response.send_message("No buttons have been posted yet in this channel.", ephemeral=True)
             return
 
-        results = self.active_view.get_results()
+        results = view.get_results()
 
         embed = discord.Embed(
             title="Item Selection Results",
