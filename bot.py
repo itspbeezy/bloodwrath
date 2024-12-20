@@ -24,6 +24,7 @@ async def on_ready():
         print(f"Error syncing commands: {e}")
 
 async def load_extensions():
+    """Load all extensions (cogs) asynchronously."""
     initial_extensions = ["admin_cog", "attendance_cog", "absence_cog", "schedule_cog"]
     for extension in initial_extensions:
         try:
@@ -32,7 +33,7 @@ async def load_extensions():
         except Exception as e:
             print(f"Failed to load {extension}: {e}")
 
-# Run the bot and load extensions asynchronously
+# Main entry point
 async def main():
     async with bot:
         await load_extensions()
