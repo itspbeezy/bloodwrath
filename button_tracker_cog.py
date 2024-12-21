@@ -3,11 +3,11 @@ from discord.ext import commands
 from discord import app_commands
 
 # Role and admin permission check
-def has_admin_or_role(role_id):
+def has_admin_or_roles(role_ids):
     def predicate(interaction: discord.Interaction):
         if isinstance(interaction.user, discord.Member):
             is_admin = interaction.user.guild_permissions.administrator
-            has_role = any(role.id == role_id for role in interaction.user.roles)
+            has_role = any(role.id in role_ids for role in interaction.user.roles)
             return is_admin or has_role
         return False
     return app_commands.check(predicate)
@@ -50,7 +50,7 @@ class ButtonTrackerCog(commands.Cog):
         self.active_views = {}  # Track active views per channel
 
     @app_commands.command(name="post_buttons", description="Post item selection buttons.")
-    @has_admin_or_role(1308283136786042970)
+    @has_admin_or_roles([1308283136786042970, 1308283382513274910])
     async def post_buttons(self, interaction: discord.Interaction):
         """Post the buttons to the thread or channel."""
         view = ItemSelectionButtons()
@@ -70,7 +70,7 @@ class ButtonTrackerCog(commands.Cog):
         await interaction.response.send_message(embed=embed, view=view)
 
     @app_commands.command(name="list_results", description="List users who selected each button.")
-    @has_admin_or_role(1308283136786042970)
+    @has_admin_or_roles([1308283136786042970, 1308283382513274910])
     async def list_results(self, interaction: discord.Interaction):
         """List the users who selected each button."""
         view = self.active_views.get(interaction.channel.id)
@@ -98,6 +98,41 @@ class ButtonTrackerCog(commands.Cog):
             name="Sell",
             value="\n".join(results["Sell"]) if results["Sell"] else "No users selected.",
             inline=False
+        )
+
+        await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="post_rules", description="Post the guild rules.")
+    @has_admin_or_roles([1308283136786042970, 1308283382513274910])
+    async def post_rules(self, interaction: discord.Interaction):
+        """Post the guild rules."""
+        embed = discord.Embed(
+            title="Guild Rules and Loot Policies",
+            description=(
+                "**Guild Rules:**\n"
+                "- Be friendly and helpful\n"
+                "- Be active\n"
+                "- Maintain a weekly guild reputation of **5000+**. Anything lower will result in warnings and removal.\n"
+                "- **MANDATORY** attendance for ARCH / 8PM CONFLICT BOSSES. 11PM BOSSES ARE NOT MANDATORY.\n\n"
+                "**Upcoming GvG Content (Rifts, Boons):**\n"
+                "A list of enemy healers and tanks will be sent out:\n"
+                "- Feud the healers to target them.\n"
+                "- Interest the tanks to avoid hitting them.\n"
+                "This makes destabilizing the enemy's ball easier.\n"
+                "Before each war, a list of names will be provided for targeting.\n\n"
+                "**Loot Rules:**\n"
+                "- To qualify for loot, you must have a minimum of **10,000 guild reputation**.\n"
+                "- The council will post loot details in <#1295194850584432710>, including the item name, trait, and screenshot.\n"
+                "- Use the bot's buttons (Best In Slot, Trait, Sell) to indicate your need:\n"
+                "  - **BIS:** You NEED the item for your build.\n"
+                "  - **Trait:** You need the trait.\n"
+                "  - **Sell:** You want the item for Lucent.\n\n"
+                "**ArchBoss Drops:**\n"
+                "- Handled by the council, based on who benefits the most.\n"
+                "- Multiple candidates will roll for it, or the item will be sold for guild-wide benefits.\n"
+                "- These rules may evolve as BloodWrath grows and learns together."
+            ),
+            color=discord.Color.red()
         )
 
         await interaction.response.send_message(embed=embed)
