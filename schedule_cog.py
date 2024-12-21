@@ -25,7 +25,7 @@ class ScheduleCog(commands.Cog):
         # Adding fields for each day of the week
         embed.add_field(
             name="📅 Sunday",
-            value="• **Siege:** 5:00 PM EST *(Every other Sunday)*\n"
+            value="• **Siege:** 4:00 PM EST *(Every other Sunday)*\n"
                   "• **Guild Bosses:** 7:30 PM EST\n"
                   "• **Rift Stone Boss:** After Guild Bosses\n"
                   "• **Conflict Bosses (Alliance):** 8:00 PM & 11:00 PM EST",
@@ -50,6 +50,7 @@ class ScheduleCog(commands.Cog):
         embed.add_field(
             name="📅 Wednesday",
             value="• **Rift Stone Boss:** 7:30 PM EST\n"
+                  "• **Arch Boss:** 8:00 PM EST\n"
                   "• **Conflict Bosses (Alliance):** 8:00 PM & 11:00 PM EST",
             inline=False
         )
@@ -71,6 +72,7 @@ class ScheduleCog(commands.Cog):
         embed.add_field(
             name="📅 Saturday",
             value="• **Rift Stone Boss:** 7:30 PM EST\n"
+                  "• **Arch Boss:** 8:00 PM EST\n"
                   "• **Conflict Bosses (Alliance):** 8:00 PM & 11:00 PM EST\n"
                   "• **Boon Stone:** 9:00 PM EST\n"
                   "• **Interserver Stone:** 9:30 PM EST *(Every other week)*",
