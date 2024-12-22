@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
+from discord import Interaction
 
 # Role and admin permission check
 def has_admin_or_roles(role_ids):
@@ -103,7 +104,9 @@ class ButtonTrackerCog(commands.Cog):
         await interaction.response.send_message(embed=embed)
 
 @app_commands.command(name="post_rules", description="Post the guild rules.")
-async def post_rules(self, interaction):
+@has_admin_or_roles([1308283136786042970, 1308283382513274910])
+async def post_rules(self, interaction: Interaction):
+    """Post the guild rules."""
     embed = discord.Embed(
         title="Guild Rules and Loot Policies",
         description=(
