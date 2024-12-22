@@ -51,7 +51,7 @@ class ButtonTrackerCog(commands.Cog):
 
     @app_commands.command(name="post_buttons", description="Post item selection buttons.")
     @has_admin_or_roles([1308283136786042970, 1308283382513274910])
-    async def post_buttons(self, interaction: discord.Interaction):
+    async def post_buttons(self, interaction):
         """Post the buttons to the thread or channel."""
         view = ItemSelectionButtons()
         self.active_views[interaction.channel.id] = view
