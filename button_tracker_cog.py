@@ -102,40 +102,61 @@ class ButtonTrackerCog(commands.Cog):
 
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="post_rules", description="Post the guild rules.")
-    @has_admin_or_roles([1308283136786042970, 1308283382513274910])
-    async def post_rules(self, interaction: discord.Interaction):
-        """Post the guild rules."""
-        embed = discord.Embed(
-            title="Guild Rules and Loot Policies",
-            description=(
-                "**Guild Rules:**\n"
-                "- Be friendly and helpful\n"
-                "- Be active\n"
-                "- Maintain a weekly guild reputation of **5000+**. Anything lower will result in warnings and removal.\n"
-                "- **MANDATORY** attendance for ARCH / 8PM CONFLICT BOSSES. 11PM BOSSES ARE NOT MANDATORY.\n\n"
-                "**Upcoming GvG Content (Rifts, Boons):**\n"
-                "A list of enemy healers and tanks will be sent out:\n"
-                "- Feud the healers to target them.\n"
-                "- Interest the tanks to avoid hitting them.\n"
-                "This makes destabilizing the enemy's ball easier.\n"
-                "Before each war, a list of names will be provided for targeting.\n\n"
-                "**Loot Rules:**\n"
-                "- To qualify for loot, you must have a minimum of **10,000 guild reputation**.\n"
-                "- The council will post loot details in <#1295194850584432710>, including the item name, trait, and screenshot.\n"
-                "- Use the bot's buttons (Best In Slot, Trait, Sell) to indicate your need:\n"
-                "  - **BIS:** You NEED the item for your build.\n"
-                "  - **Trait:** You need the trait.\n"
-                "  - **Sell:** You want the item for Lucent.\n\n"
-                "**ArchBoss Drops:**\n"
-                "- Handled by the council, based on who benefits the most.\n"
-                "- Multiple candidates will roll for it, or the item will be sold for guild-wide benefits.\n"
-                "- These rules may evolve as BloodWrath grows and learns together."
-            ),
-            color=discord.Color.red()
-        )
+@app_commands.command(name="post_rules", description="Post the guild rules.")
+@has_admin_or_roles([1308283136786042970, 1308283382513274910])
+async def post_rules(self, interaction: discord.Interaction):
+    """Post the guild rules."""
+    embed = discord.Embed(
+        title="Guild Rules and Loot Policies",
+        description=(
+            "**Guild Rules:**\n"
+            "- Be friendly and helpful\n"
+            "- Be active\n"
+            "- Maintain a weekly guild reputation of **5000+**. Anything lower will result in warnings and removal.\n"
+            "- **MANDATORY** attendance for ARCH / 8PM CONFLICT BOSSES. 11PM BOSSES ARE NOT MANDATORY.\n\n"
+            "**Upcoming GvG Content (Rifts, Boons):**\n"
+            "- A list of enemy healers and tanks will be sent out:\n"
+            "  - **Feud the healers** to make them easier to target.\n"
+            "  - **Interest the tanks** to avoid hitting them.\n"
+            "- This makes destabilizing the enemy's core group easier.\n"
+            "- A list of names will be provided before each war.\n\n"
+            "**Loot Rules:**\n"
+            "- To qualify for loot, you must have a minimum of **10,000 guild reputation**.\n"
+            "- The council will post loot details in <#1295194850584432710>, including the item name, trait, and screenshot.\n"
+            "- Use the bot's buttons (**Best In Slot**, **Trait**, **Sell**) to indicate your need:\n"
+            "  - **BIS:** You NEED the item for your build.\n"
+            "  - **Trait:** You need the item's trait.\n"
+            "  - **Sell:** You want the item for Lucent.\n\n"
+            "**Additional Loot Rules for World Bosses:**\n"
+            "- If there are minimal players at a world boss (1-6), the dropper has the following options:\n"
+            "  - Sell the item directly.\n"
+            "  - Offer it to the guild for others to roll as a BIS item.\n"
+            "  - Transfer the item directly to a player in the party if they need it and the party agrees.\n\n"
+            "**ArchBoss Drops:**\n"
+            "- These items are handled by the **BloodWrath Council** based on who benefits the most. These items are often game-changing for specific classes and hold significant monetary value.\n"
+            "- **Eligibility Requirements:**\n"
+            "  - You must be active in the guild and with us for at least **3 weeks**.\n"
+            "  - The council evaluates your Discord activity, in-game activity (Guild Rep), event attendance, and willingness to help grow the guild.\n"
+            "- **Council Members:**\n"
+            "  - <@189592972461867017>\n"
+            "  - <@289221843855081472>\n"
+            "  - <@170022663551451136>\n"
+            "  - <@926111915657289730>\n"
+            "  - <@269955781665751040>\n"
+            "  - <@121386563828580352>\n"
+            "  - <@133301442491449344>\n"
+            "  - <@171753483467227136>\n"
+            "  - <@1034290439441879062>\n"
+            "  - <@284877369049743360>\n"
+            "- **Selection Process:**\n"
+            "  - Each council member nominates **3 users** who meet the above criteria.\n"
+            "  - The user with the **most votes** will receive the item.\n"
+            "  - In the case of a tie, the tied individuals will roll to settle it."
+        ),
+        color=discord.Color.red()
+    )
 
-        await interaction.response.send_message(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(ButtonTrackerCog(bot))
