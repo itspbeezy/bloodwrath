@@ -2,12 +2,10 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from discord.ui import View, Button
-from discord import Interaction
-
 
 # Permission check for admins and specific roles
 def has_admin_or_roles(role_ids):
-    def predicate(interaction):
+    def predicate(interaction: discord.Interaction):
         """Check if the user has admin permissions or required roles."""
         if isinstance(interaction.user, discord.Member):
             is_admin = interaction.user.guild_permissions.administrator
@@ -16,14 +14,14 @@ def has_admin_or_roles(role_ids):
         return False
     return app_commands.check(predicate)
 
-# Role assignment for rolls
+# View for the acknowledgment button
 class ConfirmRulesView(View):
-    def __init__(self, role_id):
+    def __init__(self, role_id: int):
         super().__init__(timeout=None)
         self.role_id = role_id
 
     @discord.ui.button(label="I Agree", style=discord.ButtonStyle.green, custom_id="confirm_rules")
-    async def confirm_rules(self, interaction: Interaction, button: Button):
+    async def confirm_rules(self, interaction: discord.Interaction, button: Button):
         """Assign the role to the user when they click the button."""
         guild = interaction.guild
         member = interaction.user
@@ -40,50 +38,49 @@ class ConfirmRulesView(View):
                 ephemeral=True,
             )
 
+# View for item selection buttons
+class ItemSelectionButtons(View):
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.bis_users = set()
+        self.trait_users = set()
+        self.sell_users = set()
+
+    @discord.ui.button(label="Best In Slot (BIS)", style=discord.ButtonStyle.green, custom_id="button_bis")
+    async def bis_button(self, interaction: discord.Interaction, button: Button):
+        """Handle BIS button click."""
+        self.bis_users.add(interaction.user)
+        await interaction.response.send_message("You selected **Best In Slot (BIS)**.", ephemeral=True)
+
+    @discord.ui.button(label="Trait", style=discord.ButtonStyle.blurple, custom_id="button_trait")
+    async def trait_button(self, interaction: discord.Interaction, button: Button):
+        """Handle Trait button click."""
+        self.trait_users.add(interaction.user)
+        await interaction.response.send_message("You selected **Trait**.", ephemeral=True)
+
+    @discord.ui.button(label="Sell", style=discord.ButtonStyle.red, custom_id="button_sell")
+    async def sell_button(self, interaction: discord.Interaction, button: Button):
+        """Handle Sell button click."""
+        self.sell_users.add(interaction.user)
+        await interaction.response.send_message("You selected **Sell**.", ephemeral=True)
+
+    def get_results(self):
+        """Retrieve the results for each button."""
+        return {
+            "BIS": [user.display_name for user in self.bis_users],
+            "Trait": [user.display_name for user in self.trait_users],
+            "Sell": [user.display_name for user in self.sell_users],
+        }
+
 # Cog class for button tracking
 class ButtonTrackerCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @app_commands.command(name="post_buttons", description="Post item selection buttons.")
     @has_admin_or_roles([1308283136786042970, 1308283382513274910])
-    async def post_buttons(self, interaction):
+    async def post_buttons(self, interaction: discord.Interaction):
         """Post the buttons for item selection."""
-        # Define buttons for BIS, Trait, and Sell
-        class ItemSelectionButtons(discord.ui.View):
-            def __init__(self):
-                super().__init__(timeout=None)
-                self.bis_users = set()
-                self.trait_users = set()
-                self.sell_users = set()
-
-            @discord.ui.button(label="Best In Slot (BIS)", style=discord.ButtonStyle.green, custom_id="button_bis")
-            async def bis_button(self, interaction, button):
-                """Handle BIS button click."""
-                self.bis_users.add(interaction.user)
-                await interaction.response.send_message("You selected **Best In Slot (BIS)**.", ephemeral=True)
-
-            @discord.ui.button(label="Trait", style=discord.ButtonStyle.blurple, custom_id="button_trait")
-            async def trait_button(self, interaction, button):
-                """Handle Trait button click."""
-                self.trait_users.add(interaction.user)
-                await interaction.response.send_message("You selected **Trait**.", ephemeral=True)
-
-            @discord.ui.button(label="Sell", style=discord.ButtonStyle.red, custom_id="button_sell")
-            async def sell_button(self, interaction, button):
-                """Handle Sell button click."""
-                self.sell_users.add(interaction.user)
-                await interaction.response.send_message("You selected **Sell**.", ephemeral=True)
-
-            def get_results(self):
-                """Retrieve the results for each button."""
-                return {
-                    "BIS": [user.display_name for user in self.bis_users],
-                    "Trait": [user.display_name for user in self.trait_users],
-                    "Sell": [user.display_name for user in self.sell_users],
-                }
-
-        # Instantiate the buttons view
         view = ItemSelectionButtons()
 
         embed = discord.Embed(
@@ -101,7 +98,7 @@ class ButtonTrackerCog(commands.Cog):
 
     @app_commands.command(name="list_results", description="List users who selected each button.")
     @has_admin_or_roles([1308283136786042970, 1308283382513274910])
-    async def list_results(self, interaction):
+    async def list_results(self, interaction: discord.Interaction):
         """List the users who selected each button."""
         view = ItemSelectionButtons()
         results = view.get_results()
@@ -128,9 +125,45 @@ class ButtonTrackerCog(commands.Cog):
 
         await interaction.response.send_message(embed=embed)
 
+    @app_commands.command(name="post_rolling_rules", description="Post the rolling rules with the acknowledgment button.")
+    @has_admin_or_roles([1308283136786042970, 1308283382513274910])
+    async def post_rolling_rules(self, interaction: discord.Interaction):
+        """Post the rolling rules and provide a button for acknowledgment."""
+        role_id = 1296641442164379678  # Replace with the actual role ID for "Item Rolls"
+        view = ConfirmRulesView(role_id)
+
+        embed = discord.Embed(
+            title="Rolling Rules",
+            description=(
+                "**Please read and acknowledge the following rules:**\n\n"
+                "**1. Item Roll Posts:**\n"
+                "- Include a **screenshot** of the desired item.\n"
+                "- The title must contain the **item name** and **trait**.\n"
+                "- Failure to follow these rules will result in deletion of your post.\n\n"
+                "**2. Contest Period:**\n"
+                "- Posts remain open for **24 hours**.\n"
+                "- After 24 hours, the reward goes to the **highest roller**.\n\n"
+                "**3. Rolling Process:**\n"
+                "- Rolls use a **D100** system.\n"
+                "- Only the **first roll** is valid.\n\n"
+                "**4. User Responsibility:**\n"
+                "- You are responsible for checking guild loot and forum posts.\n"
+                "- No one will create posts on your behalf.\n\n"
+                "**5. Intended Use:**\n"
+                "- Include the **intended use** for the item in your post.\n"
+                "- Abuse or dishonesty will result in **penalties**.\n\n"
+                "**6. Acknowledge and Agree:**\n"
+                "- React below or click the button to confirm.\n"
+                "- You will be assigned the **Item Rolls** role upon acknowledgment."
+            ),
+            color=discord.Color.blue()
+        )
+
+        await interaction.response.send_message(embed=embed, view=view)
+
     @app_commands.command(name="post_rules", description="Post the guild rules.")
     @has_admin_or_roles([1308283136786042970, 1308283382513274910])
-    async def post_rules(self, interaction):
+    async def post_rules(self, interaction: discord.Interaction):
         """Post the guild rules."""
         embed = discord.Embed(
             title="Guild Rules and Loot Policies",
@@ -179,42 +212,5 @@ class ButtonTrackerCog(commands.Cog):
 
         await interaction.response.send_message(embed=embed)
 
-# Command to post the rules with the button
-@app_commands.command(name="post_rolling_rules", description="Post the rolling rules with the acknowledgment button.")
-@has_admin_or_roles([1308283136786042970, 1308283382513274910])
-async def post_rolling_rules(self, interaction):
-    """Post the rolling rules and provide a button for acknowledgment."""
-    role_id = 1296641442164379678  # Replace with the actual role ID for "Item Rolls"
-    view = ConfirmRulesView(role_id)
-
-    embed = discord.Embed(
-        title="Rolling Rules",
-        description=(
-            "**Please read and acknowledge the following rules:**\n\n"
-            "**1. Item Roll Posts:**\n"
-            "- Include a **screenshot** of the desired item.\n"
-            "- The title must contain the **item name** and **trait**.\n"
-            "- Failure to follow these rules will result in deletion of your post.\n\n"
-            "**2. Contest Period:**\n"
-            "- Posts remain open for **24 hours**.\n"
-            "- After 24 hours, the reward goes to the **highest roller**.\n\n"
-            "**3. Rolling Process:**\n"
-            "- Rolls use a **D100** system.\n"
-            "- Only the **first roll** is valid.\n\n"
-            "**4. User Responsibility:**\n"
-            "- You are responsible for checking guild loot and forum posts.\n"
-            "- No one will create posts on your behalf.\n\n"
-            "**5. Intended Use:**\n"
-            "- Include the **intended use** for the item in your post.\n"
-            "- Abuse or dishonesty will result in **penalties**.\n\n"
-            "**6. Acknowledge and Agree:**\n"
-            "- React below or click the button to confirm.\n"
-            "- You will be assigned the **Item Rolls** role upon acknowledgment."
-        ),
-        color=discord.Color.blue()
-    )
-
-    await interaction.response.send_message(embed=embed, view=view)
-
-async def setup(bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(ButtonTrackerCog(bot))
