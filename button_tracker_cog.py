@@ -4,8 +4,7 @@ from discord import app_commands
 
 # Role and admin permission check
 def has_admin_or_roles(role_ids):
-    def predicate(interaction):
-        """Check if the user has admin permissions or a required role."""
+    def predicate(interaction: discord.Interaction):
         if isinstance(interaction.user, discord.Member):
             is_admin = interaction.user.guild_permissions.administrator
             has_role = any(role.id in role_ids for role in interaction.user.roles)
@@ -22,20 +21,17 @@ class ItemSelectionButtons(discord.ui.View):
         self.sell_users = set()
 
     @discord.ui.button(label="Best In Slot (BIS)", style=discord.ButtonStyle.green, custom_id="button_bis")
-    async def bis_button(self, interaction, button):
-        """Handle Best In Slot (BIS) button interaction."""
+    async def bis_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.bis_users.add(interaction.user)
         await interaction.response.send_message("You selected **Best In Slot (BIS)**.", ephemeral=True)
 
     @discord.ui.button(label="Trait", style=discord.ButtonStyle.blurple, custom_id="button_trait")
-    async def trait_button(self, interaction, button):
-        """Handle Trait button interaction."""
+    async def trait_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.trait_users.add(interaction.user)
         await interaction.response.send_message("You selected **Trait**.", ephemeral=True)
 
     @discord.ui.button(label="Sell", style=discord.ButtonStyle.red, custom_id="button_sell")
-    async def sell_button(self, interaction, button):
-        """Handle Sell button interaction."""
+    async def sell_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.sell_users.add(interaction.user)
         await interaction.response.send_message("You selected **Sell**.", ephemeral=True)
 
@@ -55,7 +51,7 @@ class ButtonTrackerCog(commands.Cog):
 
     @app_commands.command(name="post_buttons", description="Post item selection buttons.")
     @has_admin_or_roles([1308283136786042970, 1308283382513274910])
-    async def post_buttons(self, interaction):
+    async def post_buttons(self, interaction: discord.Interaction):
         """Post the buttons to the thread or channel."""
         view = ItemSelectionButtons()
         self.active_views[interaction.channel.id] = view
@@ -75,7 +71,7 @@ class ButtonTrackerCog(commands.Cog):
 
     @app_commands.command(name="list_results", description="List users who selected each button.")
     @has_admin_or_roles([1308283136786042970, 1308283382513274910])
-    async def list_results(self, interaction):
+    async def list_results(self, interaction: discord.Interaction):
         """List the users who selected each button."""
         view = self.active_views.get(interaction.channel.id)
         if not view:
@@ -108,7 +104,7 @@ class ButtonTrackerCog(commands.Cog):
 
     @app_commands.command(name="post_rules", description="Post the guild rules.")
     @has_admin_or_roles([1308283136786042970, 1308283382513274910])
-    async def post_rules(self, interaction):
+    async def post_rules(self, interaction: discord.Interaction):
         """Post the guild rules."""
         embed = discord.Embed(
             title="Guild Rules and Loot Policies",
@@ -119,38 +115,22 @@ class ButtonTrackerCog(commands.Cog):
                 "- Maintain a weekly guild reputation of **5000+**. Anything lower will result in warnings and removal.\n"
                 "- **MANDATORY** attendance for ARCH / 8PM CONFLICT BOSSES. 11PM BOSSES ARE NOT MANDATORY.\n\n"
                 "**Upcoming GvG Content (Rifts, Boons):**\n"
-                "- A list of enemy healers and tanks will be sent out:\n"
-                "  - **Feud the healers** to make them easier to target.\n"
-                "  - **Interest the tanks** to avoid hitting them.\n"
-                "- This makes destabilizing the enemy's core group easier.\n"
-                "- A list of names will be provided before each war.\n\n"
+                "A list of enemy healers and tanks will be sent out:\n"
+                "- Feud the healers to target them.\n"
+                "- Interest the tanks to avoid hitting them.\n"
+                "This makes destabilizing the enemy's ball easier.\n"
+                "Before each war, a list of names will be provided for targeting.\n\n"
                 "**Loot Rules:**\n"
                 "- To qualify for loot, you must have a minimum of **10,000 guild reputation**.\n"
-                "- If there are minimal players at a world boss (1-6), the dropper has the following options:\n"
-                "  - Sell the item directly.\n"
-                "  - Offer it to the guild for others to roll as a BIS item.\n"
-                "  - Transfer the item directly to a player in the party if they need it and the party agrees.\n\n"
+                "- The council will post loot details in <#1295194850584432710>, including the item name, trait, and screenshot.\n"
+                "- Use the bot's buttons (Best In Slot, Trait, Sell) to indicate your need:\n"
+                "  - **BIS:** You NEED the item for your build.\n"
+                "  - **Trait:** You need the trait.\n"
+                "  - **Sell:** You want the item for Lucent.\n\n"
                 "**ArchBoss Drops:**\n"
-                "- These items are handled by the **BloodWrath Council** based on who benefits the most.\n"
-                "- Eligibility requires:\n"
-                "  - Being active in the guild for at least **3 weeks**.\n"
-                "  - High Discord and in-game activity.\n"
-                "  - Participation in events and willingness to help grow the guild.\n"
-                "- **Council Members:**\n"
-                "  - <@189592972461867017>\n"
-                "  - <@289221843855081472>\n"
-                "  - <@170022663551451136>\n"
-                "  - <@926111915657289730>\n"
-                "  - <@269955781665751040>\n"
-                "  - <@121386563828580352>\n"
-                "  - <@133301442491449344>\n"
-                "  - <@171753483467227136>\n"
-                "  - <@1034290439441879062>\n"
-                "  - <@284877369049743360>\n"
-                "- Selection Process:\n"
-                "  - Each council member nominates **3 users** who meet the criteria.\n"
-                "  - The user with the **most votes** receives the item.\n"
-                "  - In case of a tie, a roll is used to decide."
+                "- Handled by the council, based on who benefits the most.\n"
+                "- Multiple candidates will roll for it, or the item will be sold for guild-wide benefits.\n"
+                "- These rules may evolve as BloodWrath grows and learns together."
             ),
             color=discord.Color.red()
         )
