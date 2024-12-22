@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
+from discord.ui import View, Button
+from discord import Interaction
 
 
 # Permission check for admins and specific roles
@@ -14,6 +16,29 @@ def has_admin_or_roles(role_ids):
         return False
     return app_commands.check(predicate)
 
+# Role assignment for rolls
+class ConfirmRulesView(View):
+    def __init__(self, role_id):
+        super().__init__(timeout=None)
+        self.role_id = role_id
+
+    @discord.ui.button(label="I Agree", style=discord.ButtonStyle.green, custom_id="confirm_rules")
+    async def confirm_rules(self, interaction: Interaction, button: Button):
+        """Assign the role to the user when they click the button."""
+        guild = interaction.guild
+        member = interaction.user
+        role = guild.get_role(self.role_id)
+
+        if role in member.roles:
+            await interaction.response.send_message(
+                "You already have the required role.", ephemeral=True
+            )
+        else:
+            await member.add_roles(role)
+            await interaction.response.send_message(
+                "You have been assigned the **Item Rolls** role. Thank you for confirming!",
+                ephemeral=True,
+            )
 
 # Cog class for button tracking
 class ButtonTrackerCog(commands.Cog):
@@ -154,6 +179,42 @@ class ButtonTrackerCog(commands.Cog):
 
         await interaction.response.send_message(embed=embed)
 
+# Command to post the rules with the button
+@app_commands.command(name="post_rolling_rules", description="Post the rolling rules with the acknowledgment button.")
+@has_admin_or_roles([1308283136786042970, 1308283382513274910])
+async def post_rolling_rules(self, interaction):
+    """Post the rolling rules and provide a button for acknowledgment."""
+    role_id = 1296641442164379678  # Replace with the actual role ID for "Item Rolls"
+    view = ConfirmRulesView(role_id)
+
+    embed = discord.Embed(
+        title="Rolling Rules",
+        description=(
+            "**Please read and acknowledge the following rules:**\n\n"
+            "**1. Item Roll Posts:**\n"
+            "- Include a **screenshot** of the desired item.\n"
+            "- The title must contain the **item name** and **trait**.\n"
+            "- Failure to follow these rules will result in deletion of your post.\n\n"
+            "**2. Contest Period:**\n"
+            "- Posts remain open for **24 hours**.\n"
+            "- After 24 hours, the reward goes to the **highest roller**.\n\n"
+            "**3. Rolling Process:**\n"
+            "- Rolls use a **D100** system.\n"
+            "- Only the **first roll** is valid.\n\n"
+            "**4. User Responsibility:**\n"
+            "- You are responsible for checking guild loot and forum posts.\n"
+            "- No one will create posts on your behalf.\n\n"
+            "**5. Intended Use:**\n"
+            "- Include the **intended use** for the item in your post.\n"
+            "- Abuse or dishonesty will result in **penalties**.\n\n"
+            "**6. Acknowledge and Agree:**\n"
+            "- React below or click the button to confirm.\n"
+            "- You will be assigned the **Item Rolls** role upon acknowledgment."
+        ),
+        color=discord.Color.blue()
+    )
+
+    await interaction.response.send_message(embed=embed, view=view)
 
 async def setup(bot):
     await bot.add_cog(ButtonTrackerCog(bot))
