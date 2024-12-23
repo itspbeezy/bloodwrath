@@ -11,93 +11,90 @@ class RollCommandCog(commands.Cog):
     @app_commands.command(name="roll", description="Roll for an item with guild requirements.")
     async def roll(self, interaction: discord.Interaction):
         """Command to roll for an item."""
+        # Acknowledge the interaction immediately
+        await interaction.response.defer(ephemeral=False)
 
         # First question: Guild Reputation check
-        async def ask_guild_reputation():
-            modal = discord.ui.Modal(title="Guild Reputation Check")
+        class GuildReputationModal(discord.ui.Modal, title="Guild Reputation Check"):
+            def __init__(self):
+                super().__init__()
+                self.answer = None
 
-            class GuildReputationInput(discord.ui.TextInput):
-                def __init__(self):
-                    super().__init__(
-                        label="Do you have the required Guild Reputation (10k GREP)?",
-                        placeholder="Yes or No",
-                        required=True,
-                    )
+                self.guild_rep_input = discord.ui.TextInput(
+                    label="Do you have the required Guild Reputation (10k GREP)?",
+                    placeholder="Yes or No",
+                    required=True
+                )
+                self.add_item(self.guild_rep_input)
 
-            guild_rep_input = GuildReputationInput()
-            modal.add_item(guild_rep_input)
+            async def on_submit(self, modal_interaction: discord.Interaction):
+                self.answer = self.guild_rep_input.value.strip().lower()
+                await modal_interaction.response.defer()  # Acknowledge the modal submission
 
-            async def on_submit(modal_interaction: discord.Interaction):
-                answer = guild_rep_input.value.strip().lower()
-                if answer == "yes":
-                    await ask_item_type()
-                else:
-                    await interaction.channel.send(
-                        f"{interaction.user.mention}, you do not meet the minimum requirements to roll for this item. Get to work and get that rep up young blood!"
-                    )
+        modal = GuildReputationModal()
+        await interaction.followup.send_modal(modal)
+        await modal.wait()
 
-            modal.on_submit = on_submit
-            await interaction.response.send_modal(modal)
+        if modal.answer != "yes":
+            await interaction.followup.send(
+                f"{interaction.user.mention}, you do not meet the minimum requirements to roll for this item. Get to work and get that rep up young blood!"
+            )
+            return
 
         # Second question: Item type selection
-        async def ask_item_type():
-            modal = discord.ui.Modal(title="Item Selection")
+        class ItemTypeModal(discord.ui.Modal, title="Item Selection"):
+            def __init__(self):
+                super().__init__()
+                self.selected_option = None
 
-            class ItemTypeInput(discord.ui.TextInput):
-                def __init__(self):
-                    super().__init__(
-                        label="Please select the type of item:",
-                        placeholder="Options: PVP BIS, PVE BIS, Trait, Sell, Lithograph",
-                        required=True,
-                    )
+                self.item_type_input = discord.ui.TextInput(
+                    label="Please select the type of item:",
+                    placeholder="Options: PVP BIS, PVE BIS, Trait, Sell, Lithograph",
+                    required=True
+                )
+                self.add_item(self.item_type_input)
 
-            item_type_input = ItemTypeInput()
-            modal.add_item(item_type_input)
+            async def on_submit(self, modal_interaction: discord.Interaction):
+                self.selected_option = self.item_type_input.value.strip().lower()
+                await modal_interaction.response.defer()  # Acknowledge the modal submission
 
-            async def on_submit(modal_interaction: discord.Interaction):
-                selected_option = item_type_input.value.strip().lower()
-                valid_options = ["pvp bis", "pve bis", "trait", "sell", "lithograph"]
+        item_modal = ItemTypeModal()
+        await interaction.followup.send_modal(item_modal)
+        await item_modal.wait()
 
-                if selected_option not in valid_options:
-                    await interaction.channel.send(
-                        f"{interaction.user.mention}, invalid selection. Please try again."
-                    )
-                else:
-                    await show_dice_roll(selected_option)
-
-            modal.on_submit = on_submit
-            await interaction.response.send_modal(modal)
+        valid_options = ["pvp bis", "pve bis", "trait", "sell", "lithograph"]
+        if item_modal.selected_option not in valid_options:
+            await interaction.followup.send(
+                f"{interaction.user.mention}, invalid selection. Please try again."
+            )
+            return
 
         # Show dice roll animation and results
-        async def show_dice_roll(selected_option):
-            dice_message = await interaction.channel.send(
-                f"{interaction.user.mention} is rolling the dice..."
-            )
+        dice_message = await interaction.followup.send(
+            f"{interaction.user.mention} is rolling the dice..."
+        )
 
-            # Simulate dice rolling animation
-            for _ in range(3):
-                await asyncio.sleep(1)
-                await dice_message.edit(content=f"🎲 Rolling... {random.randint(1, 100)}")
+        # Simulate dice rolling animation
+        for _ in range(3):
+            await asyncio.sleep(1)
+            await dice_message.edit(content=f"🎲 Rolling... {random.randint(1, 100)}")
 
-            # Final dice result
-            final_roll = random.randint(1, 100)
-            readable_option = selected_option.upper()
+        # Final dice result
+        final_roll = random.randint(1, 100)
+        readable_option = item_modal.selected_option.upper()
 
-            embed = discord.Embed(
-                title="Roll Results",
-                description=(
-                    f"**User:** {interaction.user.mention}\n"
-                    f"**Meets Guild Reputation:** Yes\n"
-                    f"**Selected Option:** {readable_option}\n"
-                    f"**Dice Roll:** {final_roll}"
-                ),
-                color=discord.Color.green()
-            )
+        embed = discord.Embed(
+            title="Roll Results",
+            description=(
+                f"**User:** {interaction.user.mention}\n"
+                f"**Meets Guild Reputation:** Yes\n"
+                f"**Selected Option:** {readable_option}\n"
+                f"**Dice Roll:** {final_roll}"
+            ),
+            color=discord.Color.green()
+        )
 
-            await dice_message.edit(content=f"{interaction.user.mention}'s roll is complete! 🎲", embed=embed)
-
-        # Start the interaction with the guild reputation question
-        await ask_guild_reputation()
+        await dice_message.edit(content=f"{interaction.user.mention}'s roll is complete! 🎲", embed=embed)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(RollCommandCog(bot))
