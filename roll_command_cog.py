@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import random
+import asyncio
 
 class RollCommandCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -10,27 +11,31 @@ class RollCommandCog(commands.Cog):
     @app_commands.command(name="roll", description="Roll for an item with guild requirements.")
     async def roll(self, interaction: discord.Interaction):
         """Command to roll for an item."""
+        # Defer the interaction to prevent timeout
+        await interaction.response.defer(ephemeral=False)
+
         class RollModal(discord.ui.Modal, title="Item Roll Form"):
             def __init__(self):
                 super().__init__()
 
-                self.add_item(discord.ui.TextInput(
+                self.guild_rep_input = discord.ui.TextInput(
                     label="Do you have the required Guild Reputation (10k GREP)?",
                     placeholder="Yes or No",
                     required=True,
                     max_length=3
-                ))
+                )
+                self.add_item(self.guild_rep_input)
 
-                self.add_item(discord.ui.TextInput(
+                self.item_type_input = discord.ui.TextInput(
                     label="Select the type of item",
                     placeholder="Options: PVP BIS, PVE BIS, Trait, Sell, Lithograph",
                     required=True
-                ))
+                )
+                self.add_item(self.item_type_input)
 
             async def on_submit(self, modal_interaction: discord.Interaction):
-                # Retrieve user input
-                guild_rep = self.children[0].value.strip().lower()
-                item_type = self.children[1].value.strip().lower()
+                guild_rep = self.guild_rep_input.value.strip().lower()
+                item_type = self.item_type_input.value.strip().lower()
 
                 if guild_rep != "yes":
                     await modal_interaction.response.send_message(
@@ -72,7 +77,7 @@ class RollCommandCog(commands.Cog):
                 await dice_message.edit(content=f"{interaction.user.mention}'s roll is complete! 🎲", embed=embed)
 
         # Send modal
-        await interaction.response.send_modal(RollModal())
+        await interaction.followup.send_modal(RollModal())
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(RollCommandCog(bot))
