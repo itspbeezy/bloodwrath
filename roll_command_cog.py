@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import random
-import asyncio
 
 class RollCommandCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -11,9 +10,7 @@ class RollCommandCog(commands.Cog):
     @app_commands.command(name="roll", description="Roll for an item with guild requirements.")
     async def roll(self, interaction: discord.Interaction):
         """Command to roll for an item."""
-        # Defer the interaction to prevent timeout
-        await interaction.response.defer(ephemeral=False)
-
+        # Modal definition
         class RollModal(discord.ui.Modal, title="Item Roll Form"):
             def __init__(self):
                 super().__init__()
@@ -52,14 +49,6 @@ class RollCommandCog(commands.Cog):
                     return
 
                 # Simulate dice roll
-                dice_message = await modal_interaction.response.send_message(
-                    f"{interaction.user.mention} is rolling the dice... 🎲", ephemeral=False
-                )
-
-                for _ in range(3):
-                    await asyncio.sleep(1)
-                    await dice_message.edit(content=f"🎲 Rolling... {random.randint(1, 100)}")
-
                 final_roll = random.randint(1, 100)
                 readable_option = item_type.upper()
 
@@ -67,17 +56,22 @@ class RollCommandCog(commands.Cog):
                 embed = discord.Embed(
                     title="Roll Results",
                     description=(
-                        f"**User:** {interaction.user.mention}\n"
+                        f"**User:** {modal_interaction.user.mention}\n"
                         f"**Meets Guild Reputation:** Yes\n"
                         f"**Selected Option:** {readable_option}\n"
                         f"**Dice Roll:** {final_roll}"
                     ),
                     color=discord.Color.green()
                 )
-                await dice_message.edit(content=f"{interaction.user.mention}'s roll is complete! 🎲", embed=embed)
+                await modal_interaction.response.send_message(
+                    content=f"{modal_interaction.user.mention}'s roll is complete! 🎲", embed=embed
+                )
+
+        # Defer interaction to prevent timeout
+        await interaction.response.send_message("Please complete the form.", ephemeral=True)
 
         # Send modal
-        await interaction.followup.send_modal(RollModal())
+        await interaction.response.send_modal(RollModal())
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(RollCommandCog(bot))
