@@ -11,10 +11,17 @@ class RollCommandCog(commands.Cog):
     @app_commands.command(name="roll", description="Roll for an item with guild requirements.")
     async def roll(self, interaction: discord.Interaction):
         """Command to roll for an item."""
-        # Defer the interaction to prevent timeout
-        await interaction.response.defer(ephemeral=False)
+        # Embed for modal header
+        embed = discord.Embed(
+            title="Guild Reputation Check",
+            description="Do you have the required Guild Reputation (10k GREP)?",
+            color=discord.Color.blue()
+        )
+        embed.set_image(url="https://cdn.discordapp.com/attachments/1288633288717766706/1320526678337785951/discordserverlogo4.gif?ex=676a948e&is=6769430e&hm=ce36711dd71669279694b55cd999c6ee7ce75299660c61c89e3f26e1c4654dcb&")
 
-        # First Modal: Guild Reputation Check
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+        # Modal for Guild Reputation Check
         class GuildReputationModal(discord.ui.Modal, title="Guild Reputation Check"):
             def __init__(self):
                 super().__init__()
@@ -34,7 +41,7 @@ class RollCommandCog(commands.Cog):
                 else:
                     await ask_item_type(modal_interaction)
 
-        # Second Modal: Item Type Selection
+        # Modal for Item Type Selection
         class ItemTypeModal(discord.ui.Modal, title="Item Selection"):
             def __init__(self):
                 super().__init__()
