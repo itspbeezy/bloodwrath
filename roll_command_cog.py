@@ -1,74 +1,57 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-import random
 
-class RollCommandCog(commands.Cog):
+class GuildInfoCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.guild_info = {
+            "server": "Laslan - Early Access",
+            "recruitment_status": "Application Only - Apply at: <#1322470388122390599>",
+            "requirements": "4k CP+"
+        }
 
-    @app_commands.command(name="roll", description="Roll for an item with guild requirements.")
-    async def roll(self, interaction: discord.Interaction):
-        """Command to roll for an item."""
-        # Modal definition
-        class RollModal(discord.ui.Modal, title="Item Roll Form"):
-            def __init__(self):
-                super().__init__()
+    @app_commands.command(name="post_guild_info", description="Post the guild information to the designated channel.")
+    async def post_guild_info(self, interaction: discord.Interaction):
+        """Command to post the guild information."""
+        channel_id = 1322469415874465824
+        channel = interaction.guild.get_channel(channel_id)
 
-                self.guild_rep_input = discord.ui.TextInput(
-                    label="Do you have the required Guild Reputation (10k GREP)?",
-                    placeholder="Yes or No",
-                    required=True,
-                    max_length=3
-                )
-                self.add_item(self.guild_rep_input)
+        if not channel:
+            await interaction.response.send_message("The designated channel could not be found.", ephemeral=True)
+            return
 
-                self.item_type_input = discord.ui.TextInput(
-                    label="Select the type of item",
-                    placeholder="Options: PVP BIS, PVE BIS, Trait, Sell, Lithograph",
-                    required=True
-                )
-                self.add_item(self.item_type_input)
+        embed = discord.Embed(
+            title="Guild Information",
+            description=(
+                "Blood Wrath is a hardcore PVP guild looking to dominate the battlefield and contest and conquer "
+                "world bosses, arch bosses, boon and riftstone battles and guild PVP events. We also are pushing "
+                "limits for Runes and all PVE content."
+            ),
+            color=discord.Color.red()
+        )
+        embed.set_image(url="https://cdn.discordapp.com/attachments/1288633288717766706/1320526678337785951/discordserverlogo4.gif?ex=6770834e&is=676f31ce&hm=e836cb4196a478456e281d368b7158671c0e1a03dab8b6fc42ed9275674f9b41&")
 
-            async def on_submit(self, modal_interaction: discord.Interaction):
-                guild_rep = self.guild_rep_input.value.strip().lower()
-                item_type = self.item_type_input.value.strip().lower()
+        embed.add_field(name="Server", value=self.guild_info["server"], inline=False)
+        embed.add_field(name="Recruitment Status", value=self.guild_info["recruitment_status"], inline=False)
+        embed.add_field(name="Requirements", value=self.guild_info["requirements"], inline=False)
 
-                if guild_rep != "yes":
-                    await modal_interaction.response.send_message(
-                        "You do not meet the minimum requirements to roll for this item. Get to work and get that rep up young blood!",
-                        ephemeral=True
-                    )
-                    return
+        await channel.send(embed=embed)
+        await interaction.response.send_message("Guild information posted successfully!", ephemeral=True)
 
-                valid_options = ["pvp bis", "pve bis", "trait", "sell", "lithograph"]
-                if item_type not in valid_options:
-                    await modal_interaction.response.send_message(
-                        "Invalid item type selected. Please try again.", ephemeral=True
-                    )
-                    return
+    @app_commands.command(name="update_guild_info", description="Update the guild information.")
+    @app_commands.describe(
+        server="The server name and status.",
+        recruitment_status="The recruitment status and application link.",
+        requirements="The requirements to join the guild."
+    )
+    async def update_guild_info(self, interaction: discord.Interaction, server: str, recruitment_status: str, requirements: str):
+        """Command to update the guild information."""
+        self.guild_info["server"] = server
+        self.guild_info["recruitment_status"] = recruitment_status
+        self.guild_info["requirements"] = requirements
 
-                # Simulate dice roll
-                final_roll = random.randint(1, 100)
-                readable_option = item_type.upper()
-
-                # Display results
-                embed = discord.Embed(
-                    title="Roll Results",
-                    description=(
-                        f"**User:** {modal_interaction.user.mention}\n"
-                        f"**Meets Guild Reputation:** Yes\n"
-                        f"**Selected Option:** {readable_option}\n"
-                        f"**Dice Roll:** {final_roll}"
-                    ),
-                    color=discord.Color.green()
-                )
-                await modal_interaction.response.send_message(
-                    content=f"{modal_interaction.user.mention}'s roll is complete! 🎲", embed=embed
-                )
-
-        # Send modal directly
-        await interaction.response.send_modal(RollModal())
+        await interaction.response.send_message("Guild information updated successfully!", ephemeral=True)
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(RollCommandCog(bot))
+    await bot.add_cog(GuildInfoCog(bot))
