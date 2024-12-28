@@ -53,5 +53,39 @@ class GuildInfoCog(commands.Cog):
 
         await interaction.response.send_message("Guild information updated successfully!", ephemeral=True)
 
+    @app_commands.command(name="post_rules", description="Post the Discord rules to the designated channel.")
+    async def post_rules(self, interaction: discord.Interaction):
+        """Command to post the Discord rules."""
+        channel_id = 1235798906382585909
+        channel = interaction.guild.get_channel(channel_id)
+
+        if not channel:
+            await interaction.response.send_message("The designated channel could not be found.", ephemeral=True)
+            return
+
+        embed = discord.Embed(
+            description=(
+                "[![SERVER RULES](https://cdn.discordapp.com/attachments/1122516656837623839/1322539123503796335/bwrules.gif?ex=67713e0a&is=676fec8a&hm=b9e47f206c72ab155cee7f9eef4f57fc9b9a343a179c4034b0d6257856db3cec&)](https://discordapp.com)\n\n"
+                ":rules: **Rules & Expectations!**\n"
+                ":arrow: [Terms and Conditions](https://discordapp.com/terms)\n"
+                ":arrow: [Privacy Policy](https://discordapp.com/privacy)\n"
+                ":arrow: [Guidelines](https://discordapp.com/guidelines)\n\n"
+                ":help: **Rule 1: Courteous Conduct**\n"
+                "Demonstrate courtesy and consideration. Embrace diverse perspectives and opinions. Engage in debates respectfully; say no to harassment and trolling.\n\n"
+                ":help: **Rule 2: Content Standards**\n"
+                "Decline repetitive messages, excessive user tagging, and harmful content. Keep NSFW content away from our realms.\n\n"
+                ":help: **Rule 3: No Spam or Advertising**\n"
+                "Reject repetitive messages, excessive user tagging, and harmful materials. Direct advertising and affiliate links are unwelcome.\n\n"
+                ":help: **Rule 4: Channel Etiquette**\n"
+                "Navigate channels wisely; use them as intended. Role mentions should align with the channel's theme.\n\n"
+                ":help: **Rule 5: Privacy and Personal Information**\n"
+                "Safeguard personal information as a dragon guards its treasure. No doxxing, sharing addresses, phone numbers, and sensitive data."
+            ),
+            color=discord.Color.blue()
+        )
+
+        await channel.send(embed=embed)
+        await interaction.response.send_message("Discord rules posted successfully!", ephemeral=True)
+
 async def setup(bot: commands.Bot):
     await bot.add_cog(GuildInfoCog(bot))
