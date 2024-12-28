@@ -64,8 +64,8 @@ class GuildInfoCog(commands.Cog):
             return
 
         embed = discord.Embed(
+            title="SERVER RULES",
             description=(
-                "[![SERVER RULES](https://cdn.discordapp.com/attachments/1122516656837623839/1322539123503796335/bwrules.gif?ex=67713e0a&is=676fec8a&hm=b9e47f206c72ab155cee7f9eef4f57fc9b9a343a179c4034b0d6257856db3cec&)](https://discordapp.com)\n\n"
                 ":rules: **Rules & Expectations!**\n"
                 ":arrow: [Terms and Conditions](https://discordapp.com/terms)\n"
                 ":arrow: [Privacy Policy](https://discordapp.com/privacy)\n"
@@ -83,6 +83,7 @@ class GuildInfoCog(commands.Cog):
             ),
             color=discord.Color.blue()
         )
+        embed.set_image(url="https://cdn.discordapp.com/attachments/1122516656837623839/1322539123503796335/bwrules.gif?ex=67713e0a&is=676fec8a&hm=b9e47f206c72ab155cee7f9eef4f57fc9b9a343a179c4034b0d6257856db3cec&")
 
         await channel.send(embed=embed)
         await interaction.response.send_message("Discord rules posted successfully!", ephemeral=True)
