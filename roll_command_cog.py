@@ -6,7 +6,7 @@ class GuildInfoCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.guild_info = {
-            "server": "Laslan - Early Access",
+            "server": "Magma - Early Access",
             "recruitment_status": "Application Only - Apply at: <#1322470388122390599>",
             "requirements": "4k CP+"
         }
