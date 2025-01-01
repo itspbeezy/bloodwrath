@@ -137,15 +137,15 @@ class ButtonTrackerCog(commands.Cog):
             description=(
                 "**Please read and acknowledge the following rules:**\n\n"
                 "**1. Item Roll Posts:**\n"
-                "- Staff will post the item in the loot-rolling channel\n"
-                "- If you want the item you must reply to the post with a /roll.\n"
-                "- You must include a follow up to your roll saying it its your BIS, Trait, Selling/Litho. \n\n"
+                "- Staff will post the item in the loot-rolling channel.\n"
+                "- If you want the item you must roll for the item on TLGM app.\n"
+                "- You must have a screenshot of your gear and updated builds on TLGM app.\n\n"
                 "**2. Contest Period:**\n"
-                "- Posts remain open for **72 hours**.\n"
-                "- After 72 hours, the reward goes to the **highest roller**.\n\n"
+                "- Posts remain open until loot days on Tuesdays and Saturdays.\n"
+                "- On those days, the reward goes to the **highest roller**.\n\n"
                 "**3. Rolling Process:**\n"
                 "- Rolls use a **D100** system.\n"
-                "- Only the **first roll** is valid.\n\n"
+                "- All roles are handled via TLGM.\n\n"
                 "**4. User Responsibility:**\n"
                 "- You are responsible for checking guild loot and forum posts.\n"
                 "- No one will alert you on these posts.\n\n"
@@ -161,54 +161,98 @@ class ButtonTrackerCog(commands.Cog):
 
         await interaction.response.send_message(embed=embed, view=view)
 
-    @app_commands.command(name="post_rules", description="Post the guild rules.")
-    @has_admin_or_roles([1308283136786042970, 1308283382513274910])
-    async def post_rules(self, interaction: discord.Interaction):
-        """Post the guild rules."""
+    @app_commands.command(name="post_loot_policy", description="Post the loot policy to the designated channel.")
+    async def post_loot_policy(self, interaction: discord.Interaction):
+        """Command to post the loot policy."""
+        channel_id = 1235798906382585909  # Replace with the actual channel ID
+        channel = interaction.guild.get_channel(channel_id)
+
+        if not channel:
+            await interaction.response.send_message("The designated channel could not be found.", ephemeral=True)
+            return
+
         embed = discord.Embed(
-            title="Guild Rules and Loot Policies",
+            title="Archboss Drops & Expectations",
             description=(
-                "**Guild Rules:**\n"
-                "- Be friendly and helpful\n"
-                "- Be active\n"
-                "- Maintain a weekly guild reputation of **5000+**. Anything lower will result in warnings and removal.\n"
-                "- **MANDATORY** attendance for ARCH / 8PM CONFLICT BOSSES. 11PM BOSSES ARE NOT MANDATORY.\n\n"
-                "**Upcoming GvG Content (Rifts, Boons):**\n"
-                "- A list of enemy healers and tanks will be sent out:\n"
-                "  - **Feud the healers** to make them easier to target.\n"
-                "  - **Interest the tanks** to avoid hitting them.\n"
-                "- This makes destabilizing the enemy's core group easier.\n"
-                "- A list of names will be provided before each war.\n\n"
-                "**Loot Rules:**\n"
-                "- To qualify for loot, you must have a minimum of **10,000 guild reputation**.\n"
-                "- If there are minimal players at a world boss (1-3), the dropper has the following options:\n"
-                "  - Sell the item directly.\n"
-                "  - Offer it to the guild for others to roll as a BIS item.\n"
-                "  - Transfer the item directly to a player in the party if they need it and the party agrees.\n\n"
-                "**ArchBoss Drops:**\n"
-                "- These items are handled by the **BloodWrath Council** based on who benefits the most.\n"
-                "- Eligibility requires:\n"
-                "  - Being active in the guild for at least **3 weeks**.\n"
-                "  - High Discord and in-game activity.\n"
-                "  - Participation in events and willingness to help grow the guild.\n"
-                "- **Council Members:**\n"
-                "  - <@189592972461867017>\n"
-                "  - <@289221843855081472>\n"
-                "  - <@170022663551451136>\n"
-                "  - <@926111915657289730>\n"
-                "  - <@269955781665751040>\n"
-                "  - <@121386563828580352>\n"
-                "  - <@171753483467227136>\n"
-                "  - <@284877369049743360>\n"
-                "- Selection Process:\n"
-                "  - Each council member nominates **3 users** who meet the criteria.\n"
-                "  - The user with the **most votes** receives the item.\n"
-                "  - In case of a tie, a roll is used to decide."
+                "**Loot System:**\n\n"
+                "For Archboss drops, a loot council system is in place, as outlined by Blood Wrath Leadership. "
+                "This ensures these powerful weapons remain within Blood Wrath and out of enemy hands. "
+                "The council votes on the most suitable member to receive the item, with the nominee receiving "
+                "the most votes awarded the weapon.\n\n"
+                "In the event of a tie, one of two resolutions will occur:\n"
+                "1. The tied members may roll for the item.\n"
+                "2. Luchii will make the final decision.\n\n"
+                "Luchii will always have the final decision as there are special circumstances that not all of the council are aware of.\n\n"
+                "Arch Boss Weapons are only considered for GVG builds.\n\n"
+
+                "**Archboss Expectations:**\n\n"
+                "To qualify for Archboss drops, members must meet the following criteria:\n"
+                "- Proper weapon utilization\n"
+                "- Significant guild contributions (Guild Rep/Activity)\n"
+                "- Individual player skills\n"
+                "- Consistency in performance\n"
+                "- Strong static play\n\n"
+
+                "**Weapon Guidelines**\n"
+                "**Queen Bellandir’s Weapons**\n\n"
+                "**Languishing Blade:**\n"
+                "- Frontline hard engage\n"
+                "- Large group positioning\n"
+                "- Mastery of Annihilating Slash\n"
+                "- Survivability\n"
+                "- Consistent performance in GvG/ZvZ\n\n"
+
+                "**Hivemind Staff:**\n"
+                "- High kill ranking\n"
+                "- Effective use of Fire skills\n"
+                "- Consistent performance in GvG/ZvZ\n\n"
+
+                "**Toxic Spine Throwers:**\n"
+                "- Mastery of single-target tank shred or bombing disruptions\n"
+                "- Significant impact in fights\n"
+                "- Consistent performance in GvG/ZvZ\n\n"
+
+                "**Serrated Spike:**\n"
+                "- Expertise in spear play\n"
+                "- Skilled in ball disruptions or guild setups\n"
+                "- Consistent performance in GvG/ZvZ\n\n"
+
+                "**Tevent’s Weapons**\n\n"
+                "**Warblade of Despair:**\n"
+                "- Identifying high-priority targets\n"
+                "- High DPS\n"
+                "- Strength in 1v1 situations\n"
+                "- Effective in large-group engagements\n"
+                "- Consistent performance in GvG/ZvZ\n\n"
+
+                "**Fangs of Fury:**\n"
+                "- High single-target damage\n"
+                "- Proficient in camouflage skills\n"
+                "- Strong 1v1 abilities\n"
+                "- Adept at locating high-priority targets\n\n"
+
+                "**Arc of Wailing Death:**\n"
+                "- Locating high-priority targets\n"
+                "- High DPS output\n"
+                "- Proficiency in 1v1 encounters\n"
+                "- Consistent performance in GvG/ZvZ\n\n"
+
+                "**Grasp of Withering:**\n"
+                "- Targeting high-priority enemies\n"
+                "- High DPS\n"
+                "- Accurate positioning for large-area sleeps\n"
+                "- Capability to eliminate tanks\n"
+                "- Strong in 1v1 scenarios\n"
+                "- Consistent performance in GvG/ZvZ\n\n"
+
+                "**Questions or Concerns**\n\n"
+                "For further inquiries, please ask in the <#1323922651105984575> channel."
             ),
-            color=discord.Color.red()
+            color=discord.Color.gold()
         )
 
-        await interaction.response.send_message(embed=embed)
+        await channel.send(embed=embed)
+        await interaction.response.send_message("Loot policy posted successfully!", ephemeral=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ButtonTrackerCog(bot))
