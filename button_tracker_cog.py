@@ -164,7 +164,7 @@ class ButtonTrackerCog(commands.Cog):
     @app_commands.command(name="post_loot_policy", description="Post the loot policy to the designated channel.")
     async def post_loot_policy(self, interaction: discord.Interaction):
         """Command to post the loot policy."""
-        channel_id = 1235798906382585909  # Replace with the actual channel ID
+        channel_id = 1320523622116495430  # Replace with the actual channel ID
         channel = interaction.guild.get_channel(channel_id)
 
         if not channel:
@@ -213,7 +213,7 @@ class ButtonTrackerCog(commands.Cog):
                 "- Consistent performance in GvG/ZvZ\n\n"
 
                 "**Serrated Spike:**\n"
-                "- Expertise in spear play\n"
+                "- Expertise in spear play and survivability\n"
                 "- Skilled in ball disruptions or guild setups\n"
                 "- Consistent performance in GvG/ZvZ\n\n"
 
