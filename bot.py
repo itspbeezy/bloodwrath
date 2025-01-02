@@ -25,7 +25,7 @@ async def on_ready():
 
 async def load_extensions():
     """Load all extensions (cogs) asynchronously."""
-    initial_extensions = ["admin_cog", "attendance_cog", "roll_command_cog", "absence_cog", "schedule_cog", "new_guildmember", "button_tracker_cog"]
+    initial_extensions = ["admin_cog", "attendance_cog", "roll_command_cog", "absence_cog", "schedule_cog", "new_guildmember", "test_dm_cog", "button_tracker_cog"]
     for extension in initial_extensions:
         try:
             await bot.load_extension(extension)
