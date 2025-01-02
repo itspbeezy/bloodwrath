@@ -10,12 +10,15 @@ class NewGuildMemberCog(commands.Cog):
     @app_commands.checks.has_any_role(1215718493622894603, 1308283136786042970)
     async def ginvite(self, interaction: discord.Interaction, user: discord.Member):
         """Command to invite a new member to Blood Wrath."""
+        # Acknowledge the interaction immediately
+        await interaction.response.defer(ephemeral=True)
+
         # Role to assign
         role_id = 1288636427747459083
         role = interaction.guild.get_role(role_id)
 
         if not role:
-            await interaction.response.send_message("The role could not be found.", ephemeral=True)
+            await interaction.followup.send("The role could not be found.", ephemeral=True)
             return
 
         try:
@@ -27,7 +30,7 @@ class NewGuildMemberCog(commands.Cog):
                 f"Welcome {user.mention} to **Blood Wrath**! You have been granted the Blood role. "
                 f"Introduce yourself in <#1288633288717766706> and get started!"
             )
-            await interaction.response.send_message(welcome_message)
+            await interaction.followup.send(welcome_message)
 
             # Send a private message to the user
             dm_message = (
@@ -52,7 +55,7 @@ class NewGuildMemberCog(commands.Cog):
                 "If you have any questions or concerns, you can reach out to a council member or feel free to ask in Guild Questions (<#1323922651105984575>)."
             )
 
-            # Send the DM and log success
+            # Send the DM
             await user.send(dm_message)
         except discord.Forbidden:
             await interaction.followup.send(
@@ -60,7 +63,6 @@ class NewGuildMemberCog(commands.Cog):
                 ephemeral=True,
             )
         except Exception as e:
-            # Log any unexpected errors
             await interaction.followup.send(
                 f"An unexpected error occurred: {e}", ephemeral=True
             )
