@@ -20,18 +20,19 @@ class NewGuildMemberCog(commands.Cog):
             await interaction.followup.send("The role could not be found.", ephemeral=True)
             return
 
+        # Channel ID where the webhook will post
+        channel_id = 1288633288717766706  # Replace with your target channel ID
+        channel = interaction.guild.get_channel(channel_id)
+
+        if not channel:
+            await interaction.followup.send("The designated channel could not be found.", ephemeral=True)
+            return
+
         try:
-            # Assign the role
+            # Assign the role to the user
             await user.add_roles(role)
 
-            # Send a welcome message in the channel
-            welcome_message = (
-                f"Welcome {user.mention} to **Blood Wrath**! You have been granted the Blood role. "
-                f"Introduce yourself in <#1288633288717766706> and get started!"
-            )
-            await interaction.followup.send(welcome_message)
-
-            # Send a private message to the user
+            # Send a DM to the user
             dm_message = (
                 f"Welcome {user.mention} and congratulations on being accepted to **Blood Wrath**! "
                 "We hope you are as excited as we are to have you in our ranks. With that said, "
@@ -54,17 +55,27 @@ class NewGuildMemberCog(commands.Cog):
                 "If you have any questions or concerns, you can reach out to a council member or feel free to ask in Guild Questions (<#1323922651105984575>)."
             )
 
-            await user.send(dm_message)  # Attempt to send the DM
-        except discord.Forbidden:
-            # Notify in the channel if the DM fails
-            await interaction.followup.send(
-                f"I couldn't send a DM to {user.mention}. Please check their privacy settings or ask leadership for details.",
-                ephemeral=False,
+            try:
+                await user.send(dm_message)  # Attempt to send the DM
+            except discord.Forbidden:
+                await interaction.followup.send(
+                    f"I couldn't send a DM to {user.mention}. Please check your privacy settings or ask leadership for details.",
+                    ephemeral=True,
+                )
+                return
+
+            # Use a webhook to send the welcome message
+            webhook = await channel.create_webhook(name="Blood Wrath Welcome")
+            welcome_message = (
+                f"Welcome {user.mention} to **Blood Wrath**! You have been granted the Blood role. "
+                f"Introduce yourself in <#1288633288717766706> and get started!"
             )
+            await webhook.send(welcome_message, avatar_url=self.bot.user.avatar.url)
+            await webhook.delete()  # Clean up by deleting the webhook
+
+            await interaction.followup.send(f"Welcome message sent for {user.mention}.", ephemeral=True)
         except Exception as e:
-            await interaction.followup.send(
-                f"An unexpected error occurred: {e}", ephemeral=True
-            )
+            await interaction.followup.send(f"An unexpected error occurred: {e}", ephemeral=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(NewGuildMemberCog(bot))
