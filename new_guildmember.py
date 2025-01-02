@@ -51,10 +51,19 @@ class NewGuildMemberCog(commands.Cog):
                 "You can roll for it.\n\n"
                 "If you have any questions or concerns, you can reach out to a council member or feel free to ask in Guild Questions (<#1323922651105984575>)."
             )
-            await user.send(dm_message)
 
+            # Send the DM and log success
+            await user.send(dm_message)
         except discord.Forbidden:
-            await interaction.response.send_message("I couldn't send a DM to the user. Please check their privacy settings.", ephemeral=True)
+            await interaction.followup.send(
+                f"{user.mention}, I couldn't send you a DM. Please check your privacy settings or reach out to leadership for details.",
+                ephemeral=True,
+            )
+        except Exception as e:
+            # Log any unexpected errors
+            await interaction.followup.send(
+                f"An unexpected error occurred: {e}", ephemeral=True
+            )
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(NewGuildMemberCog(bot))
