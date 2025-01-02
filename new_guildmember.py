@@ -2,6 +2,17 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
+@commands.command()
+async def testdm(self, ctx, user: discord.Member):
+    """Test if the bot can send a DM to a user."""
+    try:
+        await user.send("This is a test message from the bot.")
+        await ctx.send(f"Test DM sent to {user.mention}.")
+    except discord.Forbidden:
+        await ctx.send(f"I couldn't send a DM to {user.mention}. Please check their privacy settings.")
+    except Exception as e:
+        await ctx.send(f"An error occurred: {e}")
+
 class NewGuildMemberCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
