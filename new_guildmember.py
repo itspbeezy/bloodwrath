@@ -8,21 +8,36 @@ class NewGuildMemberCog(commands.Cog):
 
     @app_commands.command(name="ginvite", description="Invite a new user to Blood Wrath.")
     @app_commands.checks.has_any_role(1215718493622894603, 1308283136786042970)
-    async def ginvite(self, interaction: discord.Interaction, user: discord.Member):
+    async def ginvite(self, interaction: discord.Interaction, user: discord.Member, role: str):
         """Invite a new guild member."""
         await interaction.response.defer(ephemeral=True)  # Acknowledge the interaction
 
-        # Role to assign
-        role_id = 1288636427747459083
-        role = interaction.guild.get_role(role_id)
+        # Role to assign based on selection
+        role_mapping = {
+            "fire": 1324566308427403264,
+            "water": 1324566129817161820
+        }
 
-        if not role:
-            await interaction.followup.send("The role could not be found.", ephemeral=True)
+        if role.lower() not in role_mapping:
+            await interaction.followup.send(
+                "Invalid role selection. Please choose either 'fire' or 'water'.",
+                ephemeral=True
+            )
             return
 
-        # Add the role to the user
+        selected_role_id = role_mapping[role.lower()]
+        selected_role = interaction.guild.get_role(selected_role_id)
+
+        if not selected_role:
+            await interaction.followup.send("The selected role could not be found.", ephemeral=True)
+            return
+
+        # Assign both the Blood role and the selected role
+        blood_role_id = 1288636427747459083
+        blood_role = interaction.guild.get_role(blood_role_id)
+
         try:
-            await user.add_roles(role)
+            await user.add_roles(blood_role, selected_role)
         except discord.Forbidden:
             await interaction.followup.send(
                 f"I do not have permission to assign roles. Please check my permissions.", ephemeral=True
@@ -30,7 +45,7 @@ class NewGuildMemberCog(commands.Cog):
             return
         except Exception as e:
             await interaction.followup.send(
-                f"An error occurred while assigning the role: {e}", ephemeral=True
+                f"An error occurred while assigning the roles: {e}", ephemeral=True
             )
             return
 
@@ -52,7 +67,6 @@ class NewGuildMemberCog(commands.Cog):
             "- **Daily Posts:** (<#1288633941489618975>) Important information is posted here daily, including event registrations. "
             "Keep this channel unmuted.\n"
             "- **Attendance:** (<#1324502828932272128>) All event posts will be sent to this channel (mandatory and optional). "
-            "Keep this channel unmuted.\n"
             "You must select if you are attending, not able to attend, or tentative for each event.\n"
             "- **Guild Rules:** (<#1320523622116495430>) Familiarize yourself with our rules and loot policy.\n"
             "- **Schedule:** (<#1308289712670248970>) The guild schedule is located here. This is where you can see our weekly schedule.\n"
@@ -73,7 +87,7 @@ class NewGuildMemberCog(commands.Cog):
         # Post a welcome message in the channel
         try:
             await interaction.channel.send(
-                f"Welcome {user.mention} to **Blood Wrath**! You have been granted the Blood role. "
+                f"Welcome {user.mention} to **Blood Wrath**! You have been granted the Blood role and the **{role.capitalize()}** role. "
                 f"Introduce yourself in <#1288633288717766706> and get started!"
             )
             await interaction.followup.send(f"Welcome message sent for {user.mention}.", ephemeral=True)
