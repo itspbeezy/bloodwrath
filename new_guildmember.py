@@ -96,5 +96,10 @@ class NewGuildMemberCog(commands.Cog):
                 f"An error occurred while sending the welcome message: {e}", ephemeral=True
             )
 
+    @ginvite.autocomplete('role')
+    async def role_autocomplete(self, interaction: discord.Interaction, current: str):
+        roles = ["fire", "water"]
+        return [app_commands.Choice(name=role, value=role) for role in roles if current.lower() in role.lower()]
+
 async def setup(bot: commands.Bot):
     await bot.add_cog(NewGuildMemberCog(bot))
