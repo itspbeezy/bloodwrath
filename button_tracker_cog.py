@@ -187,6 +187,7 @@ class ButtonTrackerCog(commands.Cog):
 
                 "**Archboss Expectations:**\n\n"
                 "To qualify for Archboss drops, members must meet the following criteria:\n"
+                "- Being active in the guild for at least 3 weeks\n"
                 "- Proper weapon utilization\n"
                 "- Significant guild contributions (Guild Rep/Activity)\n"
                 "- Individual player skills\n"
