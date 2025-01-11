@@ -56,6 +56,11 @@ class GuildRulesCog(commands.Cog):
             "  - Water events: <#1324565142180073665>"
         ), inline=False)
         
+        embed.add_field(name="Alliance Discord:", value=(
+            "Join our alliance Discord and request roles: [Alliance Discord](https://discord.gg/sev7wcPVNa)\n"
+            "You must change your nickname in the server to the following format: **(BW) Name**"
+        ), inline=False)
+        
         embed.add_field(name="Questions:", value=(
             "If you have any questions, please feel free to ask here: <#1323922651105984575>"
         ), inline=False)
